@@ -2,8 +2,6 @@ from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings, 
 import logging
 from llama_index.core.postprocessor import LLMRerank
 from llama_index.readers.json import JSONReader
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.llms.huggingface import HuggingFaceLLM
 import torch
 from llama_index.core.retrievers import VectorIndexRetriever
 from utils import get_valid_kwargs
@@ -11,20 +9,6 @@ from utils import get_valid_kwargs
 
 #logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-Settings.embed_model = HuggingFaceEmbedding(
-    model_name="all-MiniLM-L6-v2"
-)
-
-Settings.llm = HuggingFaceLLM(
-    model_name="meta-llama/Llama-3.2-3B-Instruct",
-    tokenizer_name="meta-llama/Llama-3.2-3B-Instruct",
-    device_map="cuda:0",
-    model_kwargs={
-        "torch_dtype": torch.float16,
-    },
-    max_new_tokens=100
-)
 
 class RagReranker:
     """
@@ -150,7 +134,7 @@ class RagReranker:
             logger.info(f"Invalid argument in reranker")
             raise
     
-    def retrieve_documents(self, query: str, **kwargs) -> str:
+    def retrieve_documents(self, query: str, **kwargs) -> list[str]:
         try:
             query_bundle = QueryBundle(query)
             retrieved_nodes = self.retriever.retrieve(query_bundle)
@@ -163,6 +147,45 @@ class RagReranker:
         except Exception as e:
             logger.error(f"Error during retrieving: {str(e)}")
             raise
+
+class EnhancedRagReranker(RagReranker):
+    def _is_relevant(self, query: str, document_text: str) -> bool:
+        """Classifica a relevância usando o LLM com prompt otimizado"""
+        prompt = (
+            f"[INSTRUÇÃO] Avalie se o texto abaixo contém informações relevantes para responder: '{query}'\n"
+            f"[TEXTO] {document_text[:2000]}\n\n"
+            "Responda APENAS com 'SIM' ou 'NÃO'.\n"
+            "Considere relevante se abordar diretamente o tópico ou fornecer contexto útil."
+        )
+        
+        try:
+            response = Settings.llm.complete(prompt)
+            return response.text.strip().lower() in ["sim", "yes", "y"]
+        except Exception as e:
+            logger.error(f"Falha na classificação: {str(e)}")
+            return False  
+        
+    def retrieve_documents(self, query: str, **kwargs) -> list[str]:
+        """Sobrescreve com etapa adicional de filtragem"""
+        try:
+            # Usa a implementação original até o rerank
+            base_results = super().retrieve_documents(query, **kwargs)
+            
+            # Filtra documentos irrelevantes
+            relevant_docs = [
+                doc for doc in base_results
+                if self._is_relevant(query, doc)
+            ]
+            
+            logger.info(f"Relevância: {len(relevant_docs)}/{len(base_results)} documentos")
+            return relevant_docs
+            
+        except Exception as e:
+            logger.error(f"Falha no pipeline: {str(e)}")
+            raise
+
+class PineconeRagReranker(RagReranker):
+    pass
 
 if __name__ == '__main__':
     json_reader = JSONReader(
