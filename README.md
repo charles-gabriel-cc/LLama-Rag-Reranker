@@ -32,13 +32,16 @@ The core functionality of **LLama-Rag-Reranker** is encapsulated in the `RagRera
 
 ### Example
 
-To use the `RagReranker` class, you can instantiate it and call the `retrieve_documents` method with a query string. Below is an example of how to use the class:
+To use the `RagReranker` class, you must create a folder (e.g., `docs`) containing the documents you want to use for the RAG pipeline. You can then instantiate the class and call the `retrieve_documents` method with a query string. Below is an example of how to use the class:
+
+1. Create a folder named `docs` (or any name you prefer) and place your documents inside it.
+2. Use the following code to retrieve and rerank documents:
 
 ```python
 from rag_reranker import RagReranker
 
 # Initialize the RagReranker class
-reranker = RagReranker(data_dir="path_to_docs")
+reranker = RagReranker(data_dir="path_to_docs")  # Replace with the path to your folder
 
 # Retrieve and rerank documents based on a query
 query = "What is retrieval-augmented generation?"
