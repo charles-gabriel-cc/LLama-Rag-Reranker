@@ -3,6 +3,7 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.huggingface import HuggingFaceLLM
 from AgentRag import AgentRAG
 from llama_index.core import PromptTemplate, Settings
+import gradio as gr
 
 Settings.embed_model = HuggingFaceEmbedding(
     model_name="all-MiniLM-L6-v2"
@@ -18,11 +19,31 @@ Settings.llm = HuggingFaceLLM(
     max_new_tokens=100
 )
 
-if __name__ == '__main__':
+agent = AgentRAG()
 
-    aux = AgentRAG()
+def chat_response(user_input):
+    return agent.query(user_input)
 
-    while True:
-        user_input = input("Usuário: ")
-        for resposta_parcial in aux.query(user_input):
-            pass
+def chat_interface():
+    with gr.Blocks(theme=gr.themes.Soft()) as demo:
+        gr.Markdown("# 🤖 LLama Rag Reranker")
+        
+        chatbot = gr.Chatbot()
+        user_input = gr.Textbox(placeholder="Digite sua pergunta aqui...")
+        send_button = gr.Button("Enviar")
+        
+        def respond(chat_history, user_message):
+            chat_history.append((user_message, ""))  # Adiciona mensagem do usuário
+            bot_message = ""
+            for chunk in chat_response(user_message):
+                bot_message += chunk
+                chat_history[-1] = (user_message, bot_message)
+                yield chat_history  # Atualiza a interface dinamicamente
+        
+        send_button.click(respond, [chatbot, user_input], chatbot)
+        user_input.submit(respond, [chatbot, user_input], chatbot)
+        
+    return demo
+
+if __name__ == "__main__":
+    chat_interface().launch(share=True)

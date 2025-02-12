@@ -26,7 +26,7 @@ class ChatLlamaRag:
         for chunk in response_gen:
             print(chunk.delta, end="", flush=True)
             full_response += chunk.delta
-            yield full_response
+            yield chunk.delta
         
         # Adiciona a resposta à memória
         assistant_message = ChatMessage(role=MessageRole.ASSISTANT, content=full_response)
