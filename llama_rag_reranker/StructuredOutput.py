@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from openai import OpenAI
 
 class output_format(BaseModel):
-    isRelevant: bool = Field(..., description="Variavel que determina se o conteudo da informação é relevante, True pra sim e False para não")
+    isRelevant: bool = Field(False, description="Variavel que determina se o conteudo da informação é relevante, True pra sim e False para não")
 
 class StructuredOutput():
     def __init__(self, output_format: BaseModel = output_format) -> None:

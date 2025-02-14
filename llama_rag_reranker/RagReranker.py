@@ -143,7 +143,7 @@ class RagReranker:
         for node in retrieved_nodes:
             aux = node.node.get_text()
             query = RELEVANT_TEMPLATE.format(context_str=aux, query_str=query)
-            if self.relevancy.query_output(query)["isRelevant"]:
+            if self.relevancy.query_output(query).isRelevant:
                 relevant.append(node)
         return relevant
     
@@ -154,7 +154,7 @@ class RagReranker:
             retrieved_nodes = self.reranker.postprocess_nodes(
                 retrieved_nodes, query_bundle
             )
-            relevant_documents = self._relevancy(retrieved_nodes)
+            relevant_documents = self._relevancy(query, retrieved_nodes)
             #documents = [node.node.get_text() for node in retrieved_nodes]
             #logger.info(f"Successfully retrieved: {query}")
             #return documents
@@ -186,3 +186,4 @@ if __name__ == '__main__':
 '''
 
 #Extrair informações relevantes do paciente e salvar
+#result.dict()["isRelevant"]

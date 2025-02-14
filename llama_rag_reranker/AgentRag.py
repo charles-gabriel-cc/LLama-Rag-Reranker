@@ -1,5 +1,5 @@
 from .RagReranker import RagReranker
-from .ChatLlama import ChatLlamaRag
+from .ChatLlama import ChatLlama
 from .StructuredOutput import StructuredOutput
 from typing import Iterator
 from utils import CONTEXTUAL_QUERY_STR
@@ -13,8 +13,8 @@ class synthesized_content(BaseModel):
 class AgentRAG():
     def __init__(self, data_dir="docs", **kwargs) -> None:
         self.ragreranker = RagReranker(data_dir, **kwargs)
-        self.chat = ChatLlamaRag()
-        self.output = StructuredOutput()
+        self.chat = ChatLlama()
+        self.output = StructuredOutput(synthesized_content)
         self.retrieved_Documents = {}
             
     def query(self, query_str) -> Iterator[str]:
