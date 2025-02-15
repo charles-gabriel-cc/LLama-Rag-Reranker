@@ -3,10 +3,10 @@ from pydantic import BaseModel, Field
 from openai import OpenAI
 
 class output_format(BaseModel):
-    isRelevant: bool = Field(False, description="Variavel que determina se o conteudo da informação é relevante, True pra sim e False para não")
+    isRelevant: bool = Field(False, description="Variable that determines whether the information content is relevant to answer the user's query, True for yes and False for no")
 
 class StructuredOutput():
-    def __init__(self, output_format: BaseModel = output_format) -> None:
+    def __init__(self, output_format: BaseModel = output_format, **kwargs) -> None:
         self.client = instructor.from_openai(
             OpenAI(
                 base_url="http://localhost:11434/v1",
@@ -18,7 +18,8 @@ class StructuredOutput():
 
     def query_output(self, output: str):
         response = self.client.chat.completions.create(
-            model="llama3.2:3b",
+            #setar atributo context
+            model="deepseek-r1:1.5b",
             messages=[
                 {
                     "role": "user",

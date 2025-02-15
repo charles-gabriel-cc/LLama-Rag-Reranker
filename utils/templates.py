@@ -38,3 +38,12 @@ CONTEXTUAL_QUERY_STR = PromptTemplate(
     ""
 )
 
+NEED_RAG_TEMPLATE = PromptTemplate(
+    "You are an assistant responsible for determining whether retrieval-augmented generation (RAG) "
+    "should be used to enhance the context of a user query.\n\n"
+    "User query: \"{query_str}\"\n\n"
+    "If the query requires external knowledge or factual information beyond the available context, reply with 'True'. "
+    "Otherwise, reply with 'False'.\n\n"
+    "Answer only with 'True' or 'False'."
+)
+
