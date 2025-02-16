@@ -8,6 +8,7 @@ The project has been tested with **Python 3.10.0** and **CUDA 11.8**. To set up 
 
 - **Python**: 3.10.0
 - **CUDA**: 11.8
+- - **OLLAMA**: 11.8
 
 ## Installation
 
