@@ -64,7 +64,7 @@ class RagReranker:
             - Uses `retriever` for initial retrieval and `reranker` for post-processing.
     """
 
-    def __init__(self, data_dir: str = "docs", **kwargs) -> None:
+    def __init__(self, data_dir: str = "docs", file_extractor: dict = None, **kwargs) -> None:
         self.data_dir = data_dir
         self.documents: list[Document]
         self.index: VectorStoreIndex
@@ -72,7 +72,7 @@ class RagReranker:
         self.reranker: LLMRerank
         self.relevancy: StructuredOutput = StructuredOutput()
 
-        self._reader(**kwargs)
+        self._reader(file_extractor=file_extractor, **kwargs)
         self._create_index(**kwargs)
         self._create_retriever(**kwargs)
         self._create_reranker(**kwargs)

@@ -4,6 +4,7 @@ from llama_index.llms.huggingface import HuggingFaceLLM
 from llama_rag_reranker import AgentRAG
 from llama_index.core import PromptTemplate, Settings
 import gradio as gr
+from llama_index.readers.json import JSONReader
 
 Settings.embed_model = HuggingFaceEmbedding(
     model_name="all-MiniLM-L6-v2",
@@ -22,10 +23,16 @@ Settings.llm = HuggingFaceLLM(
     },
     max_new_tokens=100
 )
+
+json_reader = JSONReader(
+    levels_back=None,
+    is_jsonl=True,
+    clean_json=True,
+)
 #meta-llama/Llama-3.2-3B-Instruct
 #deepseek-ai/DeepSeek-R1-Distill-Llama-8B
 
-agent = AgentRAG()
+agent = AgentRAG(file_extractor={".jsonl": json_reader})
 
 def chat_response(user_input):
     return agent.query(user_input)
@@ -34,7 +41,7 @@ def chat_interface():
     with gr.Blocks(theme=gr.themes.Soft()) as demo:
         gr.Markdown("# 🤖 LLama Rag Reranker")
         
-        chatbot = gr.Chatbot(type="messages")
+        chatbot = gr.Chatbot()
         user_input = gr.Textbox(placeholder="Digite sua pergunta aqui...")
         send_button = gr.Button("Enviar")
         
@@ -53,3 +60,11 @@ def chat_interface():
 
 if __name__ == "__main__":
     chat_interface().launch(share=True)
+
+#question = "A lesion causing compression of the facial nerve at the stylomastoid foramen will cause ipsilateral"
+#options = {
+#    "A": "paralysis of the facial muscles.",
+#    "B": "paralysis of the facial muscles and loss of taste.",
+#    "C": "paralysis of the facial muscles, loss of taste and lacrimation.",
+#    "D": "paralysis of the facial muscles, loss of taste, lacrimation and decreased salivation."
+#}

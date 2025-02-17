@@ -19,7 +19,7 @@ class StructuredOutput():
     def query_output(self, output: str):
         response = self.client.chat.completions.create(
             #setar atributo context
-            model="deepseek-r1:1.5b",
+            model="llama3.2:3b-instruct-fp16",
             messages=[
                 {
                     "role": "user",
