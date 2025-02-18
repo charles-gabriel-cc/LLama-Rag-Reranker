@@ -143,12 +143,13 @@ class RagReranker:
         for node in retrieved_nodes:
             aux = node.node.get_text()
             query = RELEVANT_TEMPLATE.format(context_str=aux, query_str=query)
-            if self.relevancy.query_output(query).isRelevant:
+            if self.relevancy.query(query).isRelevant:
                 relevant.append(node)
         return relevant
     
     def retrieve_documents(self, query: str, **kwargs) -> list[NodeWithScore]:
         try:
+            #add contextual template
             query_bundle = QueryBundle(query)
             retrieved_nodes = self.retriever.retrieve(query_bundle)
             retrieved_nodes = self.reranker.postprocess_nodes(

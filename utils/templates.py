@@ -47,3 +47,15 @@ NEED_RAG_TEMPLATE = PromptTemplate(
     "Answer only with 'True' or 'False'."
 )
 
+RAG_TEMPLATE = PromptTemplate(
+    "You are an assistant responsible for determining whether retrieval-augmented generation (RAG) should be used to enhance the context of a user query. "
+    "If the query requires external knowledge or factual information beyond the available context, reply with 'True'. Otherwise, reply with 'False'. "
+    "Answer only with 'True' or 'False'."
+)
+
+EXTRACT_CONTENT_TEMPLATE = PromptTemplate(
+    "You are an assistant responsible for extracting the content of a text."
+    "You need to separate the metadata from the text."
+    "Output the metadata as a dictionary with the respective keys."
+    "Output the text as a string."
+)
